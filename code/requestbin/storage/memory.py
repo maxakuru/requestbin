@@ -1,5 +1,5 @@
+import threading
 import time
-import operator
 
 from ..models import Bin
 
@@ -12,13 +12,15 @@ class MemoryStorage():
         self.bin_ttl = bin_ttl
         self.bins = {}
         self.request_count = 0
+        self._thread = None
 
     def do_start(self):
-        self.spawn(self._cleanup_loop)
+        self._thread = threading.Thread(target=self._cleanup_loop)
+        self._thread.start()
 
     def _cleanup_loop(self):
         while True:
-            self.async.sleep(self.cleanup_interval)
+            time.sleep(self.cleanup_interval)
             self._expire_bins()
 
     def _expire_bins(self):

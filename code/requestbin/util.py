@@ -1,6 +1,7 @@
 import time
 import random
 import base64
+import sys
 
 def random_byte(gradient=None, floor=0):
     factor = gradient or 1
@@ -22,3 +23,6 @@ def tinyid(size=6):
         baseN(abs(hash(time.time())), 36), 
         baseN(abs(hash(time.time())), 36))
     return id[0:size]
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)

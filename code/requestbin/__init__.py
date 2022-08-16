@@ -1,7 +1,10 @@
+from io import BytesIO
 from flask import Flask
-import config, os
+import os
+from werkzeug.middleware.proxy_fix import ProxyFix
 
-from cStringIO import StringIO
+from requestbin.filters import *
+from requestbin import config
 
 class WSGIRawBody(object):
     def __init__(self, application):
@@ -14,7 +17,7 @@ class WSGIRawBody(object):
 
         body = environ['wsgi.input'].read(length)
         environ['raw'] = body
-        environ['wsgi.input'] = StringIO(body)
+        environ['wsgi.input'] = BytesIO(body)
 
         # Call the wrapped application
         app_iter = self.application(environ, self._sr_callback(start_response))
@@ -33,27 +36,12 @@ class WSGIRawBody(object):
 
 app = Flask(__name__)
 
-from werkzeug.contrib.fixers import ProxyFix
 app.wsgi_app = WSGIRawBody(ProxyFix(app.wsgi_app))
 
 app.debug = config.DEBUG
 app.secret_key = config.FLASK_SESSION_SECRET_KEY
 app.root_path = os.path.abspath(os.path.dirname(__file__))
 
-if config.BUGSNAG_KEY:
-    import bugsnag
-    from bugsnag.flask import handle_exceptions
-    bugsnag.configure(
-        api_key=config.BUGSNAG_KEY,
-        project_root=app.root_path,
-        # 'production' is a magic string for bugsnag, rest are arbitrary
-        release_stage = config.REALM.replace("prod", "production"),
-        notify_release_stages=["production", "test"],
-        use_ssl = True
-    )
-    handle_exceptions(app)
-
-from filters import *
 app.jinja_env.filters['status_class'] = status_class
 app.jinja_env.filters['friendly_time'] = friendly_time
 app.jinja_env.filters['friendly_size'] = friendly_size

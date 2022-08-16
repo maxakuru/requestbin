@@ -1,6 +1,3 @@
-import feedparser
-import time
-
 from requestbin import config
 
 bin_ttl = config.BIN_TTL

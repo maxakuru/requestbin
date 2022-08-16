@@ -4,9 +4,8 @@ from urllib.parse import urlparse
 DEBUG = True
 REALM = os.environ.get('REALM', 'local')
 
-ROOT_URL = "http://localhost:5000"
-
-PORT_NUMBER = 5000
+PORT_NUMBER = os.environ.get("PORT", 5000)
+ROOT_URL = os.environ.get("ROOT_URL", f"http://localhost:{PORT_NUMBER}")
 
 FLASK_SESSION_SECRET_KEY = os.environ.get("SESSION_SECRET_KEY", "N1BKhJLnBqLpexOZdklsfDKFJDKFadsfs9a3r324YB7B73AglRmrHMDQ9RhXz35")
 
@@ -36,7 +35,7 @@ BUGSNAG_KEY = ""
 
 if REALM == 'prod':
     DEBUG = False
-    ROOT_URL = os.environ.get("ROOT_URL")
+    ROOT_URL = os.environ.get("ROOT_URL", ROOT_URL)
 
     FLASK_SESSION_SECRET_KEY = os.environ.get("SESSION_SECRET_KEY", FLASK_SESSION_SECRET_KEY)
 

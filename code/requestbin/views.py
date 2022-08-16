@@ -1,8 +1,11 @@
 from urllib.parse import urlparse
 import os
 from flask import session, request, render_template, make_response
-
 from requestbin import app, db, config
+
+# import logging
+# log = logging.getLogger('gunicorn.error')
+
 
 def update_recent_bins(name):
     if 'recent' not in session:
@@ -38,7 +41,8 @@ def bin(name):
         bin = db.lookup_bin(name)
     except KeyError:
         return "Not found\n", 404
-    if request.query_string == 'inspect':
+    
+    if request.query_string and request.query_string.decode("utf8") == 'inspect':
         if bin.private and session.get(bin.name) != bin.secret_key:
             return "Private bin\n", 403
         update_recent_bins(name)
@@ -55,7 +59,7 @@ def bin(name):
                 else:
                     host = request.host
             root_url = f"{protocol}://{host}"
-            
+        
         return render_template('bin.html',
             bin=bin,
             root_url=root_url)

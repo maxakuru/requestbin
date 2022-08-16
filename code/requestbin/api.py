@@ -1,7 +1,10 @@
 import json
 
 from flask import session, make_response, request
-from requestbin import app, db, config
+from requestbin import app, db
+
+# import logging
+# log = logging.getLogger('gunicorn.error')
 
 def _response(object, code=200):
     jsonp = request.args.get('jsonp')
@@ -11,9 +14,6 @@ def _response(object, code=200):
     else:
         resp = make_response(json.dumps(object), code)
         resp.headers['Content-Type'] = 'application/json'
-        # if config.ROOT_URL:
-        #     resp.headers['Access-Control-Allow-Origin'] = config.ROOT_URL
-        # else:
         resp.headers['Access-Control-Allow-Origin'] = "*"
             
     return resp

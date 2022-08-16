@@ -5,19 +5,22 @@ services:
     build: .
     container_name: requestbin
     ports:
-      - 6969:6969
+      - 1339:5000
     depends_on:
       - redis
     restart: unless-stopped
+    volumes:
+      - ./log:/var/log
     environment:
       - STORAGE_BACKEND=requestbin.storage.redis.RedisStorage
       - REDIS_URL=redis://redis:6379/0
-      - PORT=6969
-      - PROTOCOL=https
-      - REALM=prod
+      # - REALM=prod
+      # - PROTOCOL=https
+      # - ROOT_URL=https://bin.mydomain.com
 
   redis:
     image: redis:latest
+    container_name: requestbin-redis
     restart: unless-stopped
     ports:
       - 6390:6379

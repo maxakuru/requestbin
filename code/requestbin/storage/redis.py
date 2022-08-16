@@ -1,8 +1,5 @@
 from __future__ import absolute_import
 
-import time
-import cPickle as pickle
-
 import redis
 
 from ..models import Bin
