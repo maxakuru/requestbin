@@ -1,6 +1,10 @@
 import os
 from urllib.parse import urlparse
 
+import logging
+log = logging.getLogger('gunicorn.error')
+
+
 DEBUG = True
 REALM = os.environ.get('REALM', 'local')
 
@@ -9,12 +13,12 @@ ROOT_URL = os.environ.get("ROOT_URL", f"http://localhost:{PORT_NUMBER}")
 
 FLASK_SESSION_SECRET_KEY = os.environ.get("SESSION_SECRET_KEY", "N1BKhJLnBqLpexOZdklsfDKFJDKFadsfs9a3r324YB7B73AglRmrHMDQ9RhXz35")
 
-BIN_TTL = 48*3600
+BIN_TTL = int(os.environ.get("BIN_TTL", f'{48*3600}')) # 48 hours
 STORAGE_BACKEND = os.environ.get("STORAGE_BACKEND", "requestbin.storage.memory.MemoryStorage")
-MAX_RAW_SIZE = 1024*10
+MAX_RAW_SIZE = int(os.environ.get("MAX_RAW_SIZE", f'{1024*10}'))
 IGNORE_HEADERS = []
-MAX_REQUESTS = 1000
-CLEANUP_INTERVAL = 3600
+MAX_REQUESTS = int(os.environ.get("MAX_REQUESTS", f'{1000}'))
+CLEANUP_INTERVAL = int(os.environ.get("CLEANUP_INTERVAL", f'{3600}'))
 
 REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 url_parts = urlparse(REDIS_URL)
@@ -31,8 +35,6 @@ REDIS_DB = url_parts.fragment
 
 REDIS_PREFIX = "requestbin"
 
-BUGSNAG_KEY = ""
-
 if REALM == 'prod':
     DEBUG = False
     ROOT_URL = os.environ.get("ROOT_URL", ROOT_URL)
@@ -48,8 +50,6 @@ if REALM == 'prod':
     REDIS_PASSWORD = url_parts.password
     REDIS_DB = url_parts.fragment
 
-    BUGSNAG_KEY = os.environ.get("BUGSNAG_KEY", BUGSNAG_KEY)
-
     IGNORE_HEADERS = """
 X-Varnish
 X-Forwarded-For
@@ -62,3 +62,19 @@ X-Forwarded-Proto
 X-Via
 X-Forwarded-Port
 """.split("\n")[1:-1]
+
+log.debug(f'[config] DEBUG: {DEBUG}')
+log.debug(f'[config] REALM: {REALM}')
+log.debug(f'[config] PORT_NUMBER: {PORT_NUMBER}')
+log.debug(f'[config] ROOT_URL: {ROOT_URL}')
+log.debug(f'[config] BIN_TTL: {BIN_TTL}')
+log.debug(f'[config] STORAGE_BACKEND: {STORAGE_BACKEND}')
+log.debug(f'[config] MAX_RAW_SIZE: {MAX_RAW_SIZE}')
+log.debug(f'[config] IGNORE_HEADERS: {IGNORE_HEADERS}')
+log.debug(f'[config] MAX_REQUESTS: {MAX_REQUESTS}')
+log.debug(f'[config] CLEANUP_INTERVAL: {CLEANUP_INTERVAL}')
+# log.debug(f'[config] REDIS_URL: {REDIS_URL}')
+log.debug(f'[config] REDIS_HOST: {REDIS_HOST}')
+log.debug(f'[config] REDIS_PORT: {REDIS_PORT}')
+# log.debug(f'[config] REDIS_PASSWORD: {REDIS_PASSWORD}')
+log.debug(f'[config] REDIS_DB: {REDIS_DB}')

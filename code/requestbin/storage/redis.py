@@ -5,6 +5,8 @@ import redis
 from ..models import Bin
 
 from requestbin import config
+import logging
+log = logging.getLogger('gunicorn.error')
 
 class RedisStorage():
     prefix = config.REDIS_PREFIX
@@ -31,7 +33,6 @@ class RedisStorage():
         key = self._key(bin.name)
         self.redis.set(key, bin.dump())
         self.redis.expireat(key, int(bin.created+self.bin_ttl))
-
         self.redis.setnx(self._request_count_key(), 0)
         self.redis.incr(self._request_count_key())
 
@@ -52,6 +53,7 @@ class RedisStorage():
         try:
             bin = Bin.load(serialized_bin)
             return bin
-        except TypeError:
+        except TypeError as e:
+            log.error(f'Invalid bin error: {e}')
             self.redis.delete(key) # clear bad data
             raise KeyError("Bin not found")
