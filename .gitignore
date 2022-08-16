@@ -1,0 +1,7 @@
+**/**/*.pyc
+*.egg-info
+**/*.pyc
+serviced.log
+
+data
+.DS_Store

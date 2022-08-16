@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  requestbin:
+    build: .
+    container_name: requestbin
+    ports:
+      - 6969:6969
+    depends_on:
+      - redis
+    restart: unless-stopped
+    environment:
+      - STORAGE_BACKEND=requestbin.storage.redis.RedisStorage
+      - REDIS_URL=redis://redis:6379/0
+      - PORT=6969
+      - PROTOCOL=https
+      - REALM=prod
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    ports:
+      - 6390:6379
+    volumes:
+      - ./data:/data
